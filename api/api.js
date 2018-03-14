@@ -4,13 +4,15 @@ const uuid = require('uuid/v1');
 const mongoose = require('mongoose');
 const crypto = require('../modules/crypto');
 const fs = require('fs');
+const mv = require('mv');
+const path = require('path');
 
+const validAndSave = require('../modules/files-validation');
 const config = require('../configs/config');
 const User = require('../models/user');
 const Collection = require('../models/collection');
 const Image = require('../models/image');
 const validators = require('../modules/validators');
-const FileHandle = require('../modules/files-handle');
 
 const dataObjectsCreate = require('../modules/data-objects-create');
 mongoose.connect(config.database);
@@ -254,17 +256,21 @@ router.delete(`${prefix}/collections/:id`, (req, res) => {
     Collection.findOne({id: collId})
       .then(collection => {
         if (collection) {
-          if (collection.user === req.currentUser._id) {
+          if (collection.user.toString() === req.currentUser._id.toString()) {
             Collection.remove({id: collId})
               .then(() => {
                 Image.find({collectionId: collId})
                   .then(images => {
                     images.forEach(img => {
-                      fs.unlinkSync(img.path);
+                      fs.unlink(img.path, err => {
+                        if (err) {
+                          console.log(err)
+                        }
+                      })
                     })
                   })
                   .catch(() => {});
-                res.status(201).json({success: true});
+                res.status(200).json({success: true});
               })
               .catch(() => {
                 res.status(500).json({message: 'Server error', success: false});
@@ -281,59 +287,53 @@ router.delete(`${prefix}/collections/:id`, (req, res) => {
       });
 });
 
-router.post(`${prefix}/images`,  (req, res) => {
-    FileHandle.single('image')(req, res,function(err) {
-      if (err) {
-        res.status(422).json({message: 'File is too big', success: false});
-        return;
-      }
-      if (req.fileValidationError) {
-        res.status(422).json({message: 'Only png, jpg, gif formats are applied', success: false});
-        return;
-      }
-      if (req.body.collectionId && req.file) {
-        Collection.findOne({id: req.body.collectionId})
-          .then(collection => {
-            if (collection) {
-              if (collection.user === req.currentUser._id) {
-                let imageObject = {
-                  name: req.file.filename,
-                  id: req.file.id,
-                  title: req.body.title ? req.body.title : req.file.originalname.substring(1, 100),
-                  user: req.currentUser._id,
-                  collectionId: req.body.collectionId,
-                  path: req.file.path,
-                  mime: req.file.mimetype
-                };
-                Image.create(imageObject)
-                  .then((img) => {
-                    let resp = {
-                      path: img.path,
-                      id: img.id,
-                      collectionId: img.collectionId,
-                      title: img.title
-                    };
-                    res.status(201).json(resp);
-                  })
-                  .catch(() => {
-                    res.status(500).json({message: 'Server error', success: false});
-                  });
-
-              } else {
-                res.status(401).json({message: 'Access denied', success: false})
-              }
-            } else {
-              res.status(404).json({message: 'Collection is not found', success: false})
-            }
-          })
-          .catch(() => {
-            res.status(500).json({message: 'Server error', success: false});
-          });
+router.post(`${prefix}/images`, validAndSave, (req, res) => {
+  if (!req.fileValidationError) {
+  Collection.findOne({id: req.fields.collectionId})
+    .then(collection => {
+      if (collection) {
+        if (collection.user.toString() === req.currentUser._id.toString()) {
+          let imageObject = {
+            name: req.fileInfo.name,
+            id: req.fileInfo.id,
+            title: req.fileInfo.title,
+            user: req.currentUser._id,
+            collectionId: req.fields.collectionId,
+            path: `uploads/${req.currentUser._id}/${req.fileInfo.id}.${req.fileInfo.extension}`,
+            mime: req.fileInfo.mime
+          };
+          Image.create(imageObject)
+            .then((img) => {
+              mv(req.fileInfo.tempPath, imageObject.path, {mkdirp: true}, function(err) {
+                if (err) {
+                  res.status(500).json({message: 'Server error', success: false});
+                } else {
+                  let resp = {
+                    path: img.path,
+                    id: img.id,
+                    collectionId: img.collectionId,
+                    title: img.title
+                  };
+                  res.status(201).json(resp);
+                }
+              });
+            })
+            .catch((err) => {
+              res.status(500).json({message: 'Server error', success: false});
+            });
+        } else {
+          res.status(401).json({message: 'Access denied', success: false})
+        }
       } else {
-        res.status(400).json({success: false, message: `Collection id and image are required`});
+        res.status(404).json({message: 'Collection is not found', success: false})
       }
-
+    })
+    .catch((err) => {
+      res.status(500).json({message: 'Server error', success: false});
     });
+} else {
+  res.status(req.fileValidationError.status).json({message: req.fileValidationError.message, success: false});
+}
 });
 
 router.get(`${prefix}/collections/:id/images`, (req, res) => {
@@ -361,7 +361,7 @@ router.get(`${prefix}/images/:id`, (req, res) => {
   Image.findOne({id: imgId})
     .then(img => {
       if (img) {
-        let output =  {
+        let output = {
           id: img.id,
           title: img.title,
           path: img.path,
@@ -377,19 +377,47 @@ router.get(`${prefix}/images/:id`, (req, res) => {
     });
 });
 
-router.delete(`${prefix}/images/:id`, (req, res) => {
-  let imgId = req.params.id;
-  Image.findOne({id: imgId})
-    .then(img => {
-      if (img) {
-        if (img.user === req.currentUser._id) {
-          Image.remove({id: imgId})
-            .then()
-            .catch()
-        }
-      } else {
-        res.status(404).json({message: 'No such image', success: false});
-      }
+router.delete(`${prefix}/images`, (req, res) => {
+  let imagesArray = req.body.images;
+  Image.find({"user": req.currentUser._id.toString(), "id": {$in: imagesArray} })
+    .then(foundImages => {
+      let mappedArray = foundImages.map(img => {
+        return img.id
+      });
+      Image.remove({"id": {$in: mappedArray} })
+        .then(() => {
+          foundImages.forEach(img => {
+            fs.unlink(img.path, err => {
+              if (err) {
+                console.log(err)
+              }
+            });
+          });
+          res.status(200).json({success: true});
+        })
+        .catch(err => {
+          res.status(500).json({message: 'Server error', success: false});
+          console.log(err)
+      })
+    })
+    .catch(err => {
+      console.log(err)
+      res.status(500).json({message: 'Server error', success: false});
+    })
+});
+
+router.get(`${prefix}/images`, (req, res) => {
+  Image.find({user: req.currentUser._id.toString()})
+    .then(imgs => {
+      let output = imgs.map(img => {
+        return {
+          id: img.id,
+          title: img.title,
+          path: img.path,
+          collectionId: img.collectionId
+        };
+      });
+        res.status(200).json(output);
     })
     .catch(() => {
       res.status(500).json({message: 'Server error', success: false});
