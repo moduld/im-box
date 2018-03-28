@@ -1,12 +1,13 @@
 # compiled output
-/client/dist
 /tmp
 /out-tsc
 /i18n-serve
 # dependencies
 /node_modules
 /client/node_modules
+/front-end/node_modules
 /package-lock.json
+/uploads/
 
 # IDEs and editors
 /.idea

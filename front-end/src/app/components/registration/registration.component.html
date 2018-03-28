@@ -1,0 +1,25 @@
+<div class="container-fluid margin-null">
+  <div class="row">
+    <form class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 text-center" [formGroup]="registrationForm" (ngSubmit)="formSubmit()">
+      <div class="input-group input-group-lg">
+        <span class="input-group-addon">F</span>
+        <input type="text" class="form-control" placeholder="First name" formControlName="firstName">
+      </div>
+      <div class="input-group input-group-lg">
+        <span class="input-group-addon">L</span>
+        <input type="text" class="form-control" placeholder="Last name" formControlName="lastName">
+      </div>
+      <div class="input-group input-group-lg">
+        <span class="input-group-addon">E</span>
+        <input type="email" class="form-control" placeholder="Email" formControlName="email">
+      </div>
+      <div class="input-group input-group-lg">
+        <span class="input-group-addon">P</span>
+        <input type="password" class="form-control" placeholder="Password" formControlName="password">
+      </div>
+      <div class="btn-group" role="group">
+        <button type="submit" [disabled]="registrationForm.invalid" class="btn btn-default">Registrate</button>
+      </div>
+    </form>
+  </div>
+</div>

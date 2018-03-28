@@ -62,40 +62,40 @@ router.post(`${prefix}/login`, (req, res) => {
   if (validation.success) {
     User.findOne({email: data.email})
       .then(user => {
-          if (user && user.password === crypto(req.body.password, user.secret)) {
-            if (user.expired > new Date().getTime()) {
-              res.status(200).json(
-                {
-                  success: true,
-                  token: user.token,
-                  user: {
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    email: user.email
-                  }
-                });
-            } else {
-              let updatedData = new dataObjectsCreate.makeUserUpdateData(user.email);
-              User.findByIdAndUpdate(user._id, updatedData, {new: true})
-                .then(updated => {
-                  res.status(200).json(
-                    {
-                      success: true,
-                      token: updated.token,
-                      user: {
-                        firstName: updated.firstName,
-                        lastName: updated.lastName,
-                        email: updated.email
-                      }
-                    });
-                })
-                .catch(() => {
-                  res.status(500).json({message: 'Server error', success: false});
-                });
-            }
+        if (user && user.password === crypto(req.body.password, user.secret)) {
+          if (user.expired > new Date().getTime()) {
+            res.status(200).json(
+              {
+                success: true,
+                token: user.token,
+                user: {
+                  firstName: user.firstName,
+                  lastName: user.lastName,
+                  email: user.email
+                }
+              });
           } else {
-            res.status(401).json({message: 'Wrong credentials', success: false});
+            let updatedData = new dataObjectsCreate.makeUserUpdateData(user.email);
+            User.findByIdAndUpdate(user._id, updatedData, {new: true})
+              .then(updated => {
+                res.status(200).json(
+                  {
+                    success: true,
+                    token: updated.token,
+                    user: {
+                      firstName: updated.firstName,
+                      lastName: updated.lastName,
+                      email: updated.email
+                    }
+                  });
+              })
+              .catch(() => {
+                res.status(500).json({message: 'Server error', success: false});
+              });
           }
+        } else {
+          res.status(401).json({message: 'Wrong credentials', success: false});
+        }
       })
       .catch(() => {
         res.status(500).json({message: 'Server error', success: false});
@@ -106,9 +106,10 @@ router.post(`${prefix}/login`, (req, res) => {
 });
 
 router.use((req, res, next) => {
-  let token = req.headers['authorization'];
-  if (token) {
-    User.findOne({token: token})
+  if (req.method !== 'OPTIONS') {
+    let token = req.headers['authorization'];
+    if (token) {
+      User.findOne({token: token})
         .then(user => {
           if (user) {
             if (user.expired < new Date().getTime()) {
@@ -127,24 +128,28 @@ router.use((req, res, next) => {
             })
           }
         })
-      .catch(() => {
-        res.status(500).json({message: 'Server error', success: false});
-      });
+        .catch(() => {
+          res.status(500).json({message: 'Server error', success: false});
+        });
 
+    } else {
+      res.status(403).send({
+        success: false,
+        message: 'Unauthorized'
+      })
+      // if (req.method === 'GET') {
+      //   res.redirect('/');
+      // } else {
+      //   res.status(403).send({
+      //     success: false,
+      //     message: 'Unauthorized'
+      //   })
+      // }
+    }
   } else {
-    res.status(403).send({
-      success: false,
-      message: 'Unauthorized'
-    })
-    // if (req.method === 'GET') {
-    //   res.redirect('/');
-    // } else {
-    //   res.status(403).send({
-    //     success: false,
-    //     message: 'Unauthorized'
-    //   })
-    // }
+    next()
   }
+
 });
 
 router.post(`${prefix}/collections`, (req, res) => {
@@ -158,13 +163,13 @@ router.post(`${prefix}/collections`, (req, res) => {
     };
     Collection.create(newCollection)
       .then(collection => {
-          let resp = {
-            id: collection.id,
-            title: collection.title,
-            description: collection.description,
-            thumbnail: collection.thumbnail
-          };
-          res.status(201).json(resp);
+        let resp = {
+          id: collection.id,
+          title: collection.title,
+          description: collection.description,
+          thumbnail: collection.thumbnail
+        };
+        res.status(201).json(resp);
       })
       .catch(() => {
         res.status(500).json({message: 'Server error', success: false});
@@ -175,20 +180,20 @@ router.post(`${prefix}/collections`, (req, res) => {
 });
 
 router.get(`${prefix}/collections`, (req, res) => {
-    Collection.find({user: req.currentUser._id})
-      .then(collections => {
-        let rez = collections.map(coll => {
-          return {
-            id: coll.id,
-            title: coll.title,
-            thumbnail: coll.thumbnail,
-          };
-        });
-        res.status(200).json(rez);
-      })
-      .catch(() => {
-        res.status(500).json({message: 'Server error', success: false});
+  Collection.find({user: req.currentUser._id})
+    .then(collections => {
+      let rez = collections.map(coll => {
+        return {
+          id: coll.id,
+          title: coll.title,
+          thumbnail: coll.thumbnail,
+        };
       });
+      res.status(200).json(rez);
+    })
+    .catch(() => {
+      res.status(500).json({message: 'Server error', success: false});
+    });
 });
 
 router.get(`${prefix}/collections/:id`, (req, res) => {
@@ -210,7 +215,7 @@ router.get(`${prefix}/collections/:id`, (req, res) => {
       } else {
         res.status(404).json({message: 'Collection is not found', success: false})
       }
-      })
+    })
     .catch(() => {
       res.status(500).json({message: 'Server error', success: false});
     });
@@ -253,72 +258,27 @@ router.put(`${prefix}/collections/:id`, (req, res) => {
 
 router.delete(`${prefix}/collections/:id`, (req, res) => {
   let collId = req.params.id;
-    Collection.findOne({id: collId})
-      .then(collection => {
-        if (collection) {
-          if (collection.user.toString() === req.currentUser._id.toString()) {
-            Collection.remove({id: collId})
-              .then(() => {
-                Image.find({collectionId: collId})
-                  .then(images => {
-                    images.forEach(img => {
-                      fs.unlink(img.path, err => {
-                        if (err) {
-                          console.log(err)
-                        }
-                      })
-                    })
-                  })
-                  .catch(() => {});
-                res.status(200).json({success: true});
-              })
-              .catch(() => {
-                res.status(500).json({message: 'Server error', success: false});
-              });
-          } else {
-            res.status(401).json({message: 'Access denied', success: false})
-          }
-        } else {
-          res.status(404).json({message: 'Collection is not found', success: false})
-        }
-      })
-      .catch(() => {
-        res.status(500).json({message: 'Server error', success: false});
-      });
-});
-
-router.post(`${prefix}/images`, validAndSave, (req, res) => {
-  if (!req.fileValidationError) {
-  Collection.findOne({id: req.fields.collectionId})
+  Collection.findOne({id: collId})
     .then(collection => {
       if (collection) {
         if (collection.user.toString() === req.currentUser._id.toString()) {
-          let imageObject = {
-            name: req.fileInfo.name,
-            id: req.fileInfo.id,
-            title: req.fileInfo.title,
-            user: req.currentUser._id,
-            collectionId: req.fields.collectionId,
-            path: `uploads/${req.currentUser._id}/${req.fileInfo.id}.${req.fileInfo.extension}`,
-            mime: req.fileInfo.mime
-          };
-          Image.create(imageObject)
-            .then((img) => {
-              mv(req.fileInfo.tempPath, imageObject.path, {mkdirp: true}, function(err) {
-                if (err) {
-                  res.status(500).json({message: 'Server error', success: false});
-                } else {
-                  let resp = {
-                    path: img.path,
-                    id: img.id,
-                    collectionId: img.collectionId,
-                    title: img.title
-                  };
-                  res.status(201).json(resp);
-                }
-              });
+          Collection.remove({id: collId})
+            .then(() => {
+              Image.find({collectionId: collId})
+                .then(images => {
+                  images.forEach(img => {
+                    fs.unlink(img.path, err => {
+                      if (err) {
+                        console.log(err)
+                      }
+                    })
+                  })
+                })
+                .catch(() => {
+                });
+              res.status(200).json({success: true});
             })
-            .catch((err) => {
+            .catch(() => {
               res.status(500).json({message: 'Server error', success: false});
             });
         } else {
@@ -328,32 +288,78 @@ router.post(`${prefix}/images`, validAndSave, (req, res) => {
         res.status(404).json({message: 'Collection is not found', success: false})
       }
     })
-    .catch((err) => {
+    .catch(() => {
       res.status(500).json({message: 'Server error', success: false});
     });
-} else {
-  res.status(req.fileValidationError.status).json({message: req.fileValidationError.message, success: false});
-}
+});
+
+router.post(`${prefix}/images`, validAndSave, (req, res) => {
+  if (!req.fileValidationError) {
+    Collection.findOne({id: req.fields.collectionId})
+      .then(collection => {
+        if (collection) {
+          if (collection.user.toString() === req.currentUser._id.toString()) {
+            let imageObject = {
+              name: req.fileInfo.name,
+              id: req.fileInfo.id,
+              title: req.fileInfo.title,
+              user: req.currentUser._id,
+              collectionId: req.fields.collectionId,
+              path: `uploads/${req.currentUser._id}/${req.fileInfo.id}.${req.fileInfo.extension}`,
+              mime: req.fileInfo.mime
+            };
+            Image.create(imageObject)
+              .then((img) => {
+                mv(req.fileInfo.tempPath, imageObject.path, {mkdirp: true}, function (err) {
+                  if (err) {
+                    res.status(500).json({message: 'Server error', success: false});
+                  } else {
+                    let resp = {
+                      path: img.path,
+                      id: img.id,
+                      collectionId: img.collectionId,
+                      title: img.title
+                    };
+                    res.status(201).json(resp);
+                  }
+                });
+              })
+              .catch((err) => {
+                res.status(500).json({message: 'Server error', success: false});
+              });
+          } else {
+            res.status(401).json({message: 'Access denied', success: false})
+          }
+        } else {
+          res.status(404).json({message: 'Collection is not found', success: false})
+        }
+      })
+      .catch((err) => {
+        res.status(500).json({message: 'Server error', success: false});
+      });
+  } else {
+    res.status(req.fileValidationError.status).json({message: req.fileValidationError.message, success: false});
+  }
 });
 
 router.get(`${prefix}/collections/:id/images`, (req, res) => {
   let collId = req.params.id;
-    Image.find({collectionId: collId})
-      .then(collection => {
+  Image.find({collectionId: collId})
+    .then(collection => {
 
-        let output = collection.map(coll => {
-          return {
-            id: coll.id,
-            title: coll.title,
-            path: coll.path,
-            collectionId: coll.collectionId
-          }
-        });
-        res.status(200).json(output)
-       })
-       .catch(() => {
-         res.status(500).json({message: 'Server error', success: false});
-       });
+      let output = collection.map(coll => {
+        return {
+          id: coll.id,
+          title: coll.title,
+          path: coll.path,
+          collectionId: coll.collectionId
+        }
+      });
+      res.status(200).json(output)
+    })
+    .catch(() => {
+      res.status(500).json({message: 'Server error', success: false});
+    });
 });
 
 router.get(`${prefix}/images/:id`, (req, res) => {
@@ -379,12 +385,12 @@ router.get(`${prefix}/images/:id`, (req, res) => {
 
 router.delete(`${prefix}/images`, (req, res) => {
   let imagesArray = req.body.images;
-  Image.find({"user": req.currentUser._id.toString(), "id": {$in: imagesArray} })
+  Image.find({"user": req.currentUser._id.toString(), "id": {$in: imagesArray}})
     .then(foundImages => {
       let mappedArray = foundImages.map(img => {
         return img.id
       });
-      Image.remove({"id": {$in: mappedArray} })
+      Image.remove({"id": {$in: mappedArray}})
         .then(() => {
           foundImages.forEach(img => {
             fs.unlink(img.path, err => {
@@ -398,7 +404,7 @@ router.delete(`${prefix}/images`, (req, res) => {
         .catch(err => {
           res.status(500).json({message: 'Server error', success: false});
           console.log(err)
-      })
+        })
     })
     .catch(err => {
       console.log(err)
@@ -417,11 +423,76 @@ router.get(`${prefix}/images`, (req, res) => {
           collectionId: img.collectionId
         };
       });
-        res.status(200).json(output);
+      res.status(200).json(output);
     })
     .catch(() => {
       res.status(500).json({message: 'Server error', success: false});
     });
+});
+
+router.patch(`${prefix}/images`, (req, res) => {
+  let imagesArray = req.body.images;
+  let output = [];
+  imagesArray.forEach((imageObject, index) => {
+    if (imageObject.id && imageObject.newCollection) {
+      Image.findOne({id: imageObject.id})
+        .then(image => {
+          if (image.user.toString() === req.currentUser._id.toString()) {
+            Image.findByIdAndUpdate(image._id, {collectionId: imageObject.newCollection}, {new: true})
+              .then(updated => {
+                output.push({
+                  id: updated.id,
+                  title: updated.title,
+                  path: updated.path,
+                  collectionId: updated.collectionId
+                });
+                if (index === imagesArray.length - 1) {
+                  res.status(200).json(output);
+                }
+              })
+              .catch(() => {
+                res.status(500).json({message: 'Server error', success: false});
+                return;
+              })
+          }
+        })
+        .catch(() => {
+          res.status(500).json({message: 'Server error', success: false});
+        });
+    }
+  })
+});
+
+router.put(`${prefix}/images/:id`, (req, res) => {
+  let imgId = req.params.id;
+  let title = req.body.title;
+  if (title) {
+    Image.findOne({id: imgId}, function (err, doc){
+      if (err) {
+        res.status(500).json({message: 'Server error', success: false});
+        return;
+      }
+      if (doc) {
+        if (doc.user.toString() === req.currentUser._id.toString()) {
+          doc.title = title;
+          doc.save();
+          let output = {
+            id: doc.id,
+            title: doc.title,
+            path: doc.path,
+            collectionId: doc.collectionId
+          };
+          res.status(200).json(output);
+        } else {
+          res.status(401).json({message: 'Access denied', success: false})
+        }
+      } else {
+        res.status(404).json({message: 'No such image', success: false});
+      }
+    });
+  } else {
+    res.status(400).json({message: 'Title field is required', success: false});
+  }
 });
 
 module.exports = router;

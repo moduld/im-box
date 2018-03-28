@@ -1,20 +1,19 @@
 const Form = require('multipart-data').Form;
-
 const uuid = require('uuid/v1');
-const Mimes = require('../configs/config').fileMimes;
+const Config = require('../configs/config');
 
 module.exports = function (req, res, next) {
   const form = new Form();
 
   function fileFilter(file) {
-    return Mimes.indexOf(file.type) !== -1
+    return Config.fileMimes.indexOf(file.type) !== -1
   }
 
   form.parse(req, function (err, fields, files) {
     if (!err) {
       if (fields.collectionId && files.image) {
         if (fileFilter(files.image)) {
-          if (files.image.size < 10485760) {
+          if (files.image.size < Config.maxFileSize) {
             let id = uuid();
             let extension = files.image.type.split('/')[1];
             req.fileInfo = {

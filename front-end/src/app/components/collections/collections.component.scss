@@ -1,0 +1,47 @@
+:host {
+  position: relative;
+  display: block;
+  flex: 1;
+}
+.collection {
+  width: 200px;
+  height: 250px;
+  position: relative;
+  border: 1px solid gray;
+  border-radius: 5px;
+  overflow: hidden;
+  cursor: pointer;
+}
+.collection-thumbnail {
+  height: 100%;
+  display: block;
+}
+.title-wrapp {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 10px;
+}
+.title {
+  display: block;
+  color: white;
+  overflow: hidden;
+  font-size: 18px;
+  max-height: 50px;
+  line-height: 25px;
+}
+.add-new {
+  position: absolute;
+  right: 50px;
+  bottom: 50px;
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+  background-color: gray;
+    font-size: 50px;
+    color: white;
+  font-weight: bold;
+  cursor: pointer;
+}

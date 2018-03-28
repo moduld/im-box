@@ -5,8 +5,8 @@ module.exports = {
 
 function validateRegistrationData(data) {
   let formPatterns = {
-    firstName: /^[a-zA-Z]+$/,
-    lastName: /^[a-zA-Z]+$/,
+    firstName: /[a-zA-Z]+$/,
+    lastName: /[a-zA-Z]+$/,
     email: /[A-Za-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$/,
     password: /.{6,}/
   };

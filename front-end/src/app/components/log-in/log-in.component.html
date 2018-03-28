@@ -1,0 +1,17 @@
+<div class="container-fluid margin-null">
+  <div class="row">
+    <form class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 text-center" [formGroup]="loginForm" (ngSubmit)="formSubmit()">
+      <div class="input-group input-group-lg">
+        <span class="input-group-addon">E</span>
+        <input type="email" class="form-control" placeholder="Email" formControlName="email">
+      </div>
+      <div class="input-group input-group-lg">
+        <span class="input-group-addon">P</span>
+        <input type="password" class="form-control" placeholder="Password" formControlName="password">
+      </div>
+      <div class="btn-group" role="group">
+        <button type="submit" [disabled]="loginForm.invalid" class="btn btn-default">Log in</button>
+      </div>
+    </form>
+  </div>
+</div>
