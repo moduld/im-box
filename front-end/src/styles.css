@@ -2,6 +2,9 @@
 html, body {
   height: 100%;
 }
+body {
+  overflow: hidden;
+}
 body .margin-null {
   margin-left: 0;
   margin-right: 0;

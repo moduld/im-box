@@ -1,0 +1,78 @@
+:host {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  animation: background-open 0.3s forwards;
+  &.close-overlay {
+    animation: background-close 0.3s forwards;
+  }
+}
+.mod-body {
+  position: fixed;
+  left: 50%;
+  width: 300px;
+  background-color: white;
+  animation: modal-body-open 0.3s forwards;
+}
+.mod-content-wrapp {
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+.close-mod-body {
+  animation: modal-body-close 0.3s forwards;
+}
+.mod-content-head {
+  padding: 10px;
+  text-align: right;
+}
+.close {
+  padding: 5px;
+  font-size: 25px;
+  cursor: pointer;
+  float: none;
+}
+
+@keyframes background-open {
+  0% {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+  100% {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+}
+@keyframes background-close {
+  0% {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+  100% {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+@keyframes modal-body-open {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+    opacity: 0;
+    bottom: 100%;
+  }
+  100% {
+    transform: translate3d(-50%, 50%, 0);
+    opacity: 1;
+    bottom: 50%;
+  }
+}
+@keyframes modal-body-close {
+  0% {
+    transform: translate3d(-50%, 50%, 0);
+    opacity: 1;
+    bottom: 50%;
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+    opacity: 0;
+    bottom: 100%;
+  }
+}

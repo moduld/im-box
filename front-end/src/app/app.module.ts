@@ -10,9 +10,13 @@ import { LogInComponent } from './components/log-in/log-in.component';
 import { RegistrationComponent } from './components/registration/registration.component';
 import { CollectionsComponent } from './components/collections/collections.component';
 import { AddNewCollectionComponent } from './components/add-new-collection/add-new-collection.component';
+import { OneCollectionComponent } from './components/one-collection/one-collection.component';
+import { AddNewImageComponent } from './components/add-new-image/add-new-image.component';
+import { ModalWrapperComponent } from './components/modal-wrapper/modal-wrapper.component';
 
 import { RequestService } from './services/request.service';
 import { LocalStorageService } from './services/local-storage.service';
+import { EventsExchangeService } from './services/events-exchange.service';
 
 @NgModule({
   declarations: [
@@ -20,7 +24,10 @@ import { LocalStorageService } from './services/local-storage.service';
     LogInComponent,
     RegistrationComponent,
     CollectionsComponent,
-    AddNewCollectionComponent
+    AddNewCollectionComponent,
+    OneCollectionComponent,
+    AddNewImageComponent,
+    ModalWrapperComponent
   ],
   imports: [
     BrowserModule,
@@ -30,7 +37,8 @@ import { LocalStorageService } from './services/local-storage.service';
   ],
   providers: [
     RequestService,
-    LocalStorageService
+    LocalStorageService,
+    EventsExchangeService
   ],
   bootstrap: [AppComponent]
 })

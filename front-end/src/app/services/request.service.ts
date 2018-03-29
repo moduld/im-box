@@ -37,4 +37,11 @@ export class RequestService {
     };
     return this.httpClient.post<any>(`${this.api}/collections`, JSON.stringify(form), requestOptions)
   }
+
+  getOneCollection(id: string): Observable<any> {
+    const requestOptions: {headers} = {
+      headers: new HttpHeaders({'authorization': this.localStorageService.getUser().token})
+    };
+    return this.httpClient.get<any>(`${this.api}/collections/${id}`, requestOptions)
+  }
 }

@@ -1,14 +1,14 @@
-<div class="container-fluid margin-null">
+<div class="container-fluid margin-null" *ngIf="collectionsAreVisible">
   <div class="row">
    <div class="col-xs-12 flex-default-wrapp">
-     <div class="collection  flex-center">
-       <img src="assets/images/noimage.jpg" alt="" class="collection-thumbnail">
+     <div class="collection flex-center" *ngFor="let collection of collections" [routerLink]="collection.id">
+       <img [src]="collection.thumbnail ? collection.thumbnail : 'assets/images/noimage.jpg'" alt="" class="collection-thumbnail">
        <div class="title-wrapp">
-         <span class="title">sdvbsdfbdfb</span>
+         <span class="title" [innerHtml]="collection.title"></span>
        </div>
      </div>
    </div>
   </div>
 </div>
-<div class="add-new flex-center" routerLink="add-new">+</div>
+<div class="add-new flex-center" routerLink="add-new" *ngIf="collectionsAreVisible">+</div>
 <router-outlet></router-outlet>

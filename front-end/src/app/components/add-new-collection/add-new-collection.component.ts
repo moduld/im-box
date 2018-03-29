@@ -1,6 +1,7 @@
-import { Component, OnInit, HostBinding, HostListener } from '@angular/core';
+import { Component, OnInit, EventEmitter} from '@angular/core';
 import { Router, ActivatedRoute } from "@angular/router";
 import { RequestService } from '../../services/request.service';
+import { EventsExchangeService } from '../../services/events-exchange.service';
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 
 @Component({
@@ -10,10 +11,14 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 })
 export class AddNewCollectionComponent implements OnInit {
 
-  @HostBinding('class.close-overlay') closeModBody: boolean = false;
   addCollectionForm: FormGroup;
+  closeModal: EventEmitter<null> = new EventEmitter<null>();
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute, private requestService: RequestService, private formBuilder: FormBuilder) { }
+  constructor(private router: Router,
+              private activatedRoute: ActivatedRoute,
+              private requestService: RequestService,
+              private formBuilder: FormBuilder,
+              private eventsExchangeService: EventsExchangeService) { }
 
   ngOnInit() {
     this.addCollectionForm = this.formBuilder.group({
@@ -21,23 +26,16 @@ export class AddNewCollectionComponent implements OnInit {
     })
   }
 
-  closeModal(): void {
-    this.closeModBody = true;
-    let timeout = setTimeout(() => {
-      this.router.navigate(['../'], {relativeTo: this.activatedRoute});
-      clearTimeout(timeout);
-    }, 300)
-  }
-
   createGroup(): void {
     this.requestService.createCollection(this.addCollectionForm.value)
     .subscribe(
       (collection: any) => {
         console.log (collection);
+        this.eventsExchangeService.collectionCreated.next(collection);
+        this.closeModal.emit();
       },
       (error: any) => {
 
       })
   }
-
 }

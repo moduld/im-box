@@ -4,6 +4,8 @@ import { LogInComponent } from './components/log-in/log-in.component';
 import { RegistrationComponent } from './components/registration/registration.component';
 import { CollectionsComponent } from './components/collections/collections.component';
 import { AddNewCollectionComponent } from './components/add-new-collection/add-new-collection.component';
+import { OneCollectionComponent } from './components/one-collection/one-collection.component';
+import { AddNewImageComponent } from './components/add-new-image/add-new-image.component';
 
 const routes: Routes = [
   {
@@ -21,6 +23,16 @@ const routes: Routes = [
       {
         path: 'add-new',
         component: AddNewCollectionComponent
+      },
+      {
+        path: ':id',
+        component: OneCollectionComponent,
+        children: [
+          {
+            path: 'add-new',
+            component: AddNewImageComponent
+          }
+        ]
       }
     ]
   },
