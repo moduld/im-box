@@ -1,5 +1,7 @@
 import { Component, OnInit, HostBinding, HostListener } from '@angular/core';
 import { Router, ActivatedRoute } from "@angular/router";
+import { RequestService } from '../../services/request.service';
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 
 @Component({
   selector: 'app-add-new-collection',
@@ -9,16 +11,14 @@ import { Router, ActivatedRoute } from "@angular/router";
 export class AddNewCollectionComponent implements OnInit {
 
   @HostBinding('class.close-overlay') closeModBody: boolean = false;
+  addCollectionForm: FormGroup;
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute) { }
+  constructor(private router: Router, private activatedRoute: ActivatedRoute, private requestService: RequestService, private formBuilder: FormBuilder) { }
 
   ngOnInit() {
-    let self = this;
-    window.addEventListener('popstate', function(event) {
-      console.log(event)
-      event.preventDefault();
-      self.closeModBody = true;
-    });
+    this.addCollectionForm = this.formBuilder.group({
+      title: ['', [Validators.required] ]
+    })
   }
 
   closeModal(): void {
@@ -27,6 +27,17 @@ export class AddNewCollectionComponent implements OnInit {
       this.router.navigate(['../'], {relativeTo: this.activatedRoute});
       clearTimeout(timeout);
     }, 300)
+  }
+
+  createGroup(): void {
+    this.requestService.createCollection(this.addCollectionForm.value)
+    .subscribe(
+      (collection: any) => {
+        console.log (collection);
+      },
+      (error: any) => {
+
+      })
   }
 
 }

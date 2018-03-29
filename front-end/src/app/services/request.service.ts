@@ -30,4 +30,11 @@ export class RequestService {
     };
     return this.httpClient.get<any>(`${this.api}/collections`, requestOptions)
   }
+
+  createCollection(form: any): Observable<any> {
+    const requestOptions: {headers} = {
+      headers: new HttpHeaders({'Content-Type': 'application/json', 'authorization': this.localStorageService.getUser().token})
+    };
+    return this.httpClient.post<any>(`${this.api}/collections`, JSON.stringify(form), requestOptions)
+  }
 }
