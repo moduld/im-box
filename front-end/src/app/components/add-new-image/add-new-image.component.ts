@@ -12,17 +12,34 @@ export class AddNewImageComponent implements OnInit {
 
   closeModal: EventEmitter<null> = new EventEmitter<null>();
   addImageForm: FormGroup;
+  currentCollection: string = '';
 
   constructor(private requestService: RequestService,
               private formBuilder: FormBuilder,
               private activatedRoute: ActivatedRoute) { }
 
   ngOnInit() {
-    console.log(this.activatedRoute.parent.params['value']['id']);
+    this.currentCollection = this.activatedRoute.parent.params['value']['id'];
     this.addImageForm = this.formBuilder.group({
       title: [''],
-      image: ['']
+      image: ['', [Validators.required] ]
     })
+  }
+
+  addImage() {
+    let form = new FormData();
+    form.append('title', this.addImageForm.value.title);
+    form.append('image', this.addImageForm.value.image);
+    form.append('collectionId', this.currentCollection);
+    this.requestService.addImage(form)
+    .subscribe(
+      (resp: any) => {
+        console.log (resp);
+    },
+      (err: any) => {
+
+      });
+
   }
 
 }

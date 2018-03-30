@@ -18,6 +18,9 @@ import { RequestService } from './services/request.service';
 import { LocalStorageService } from './services/local-storage.service';
 import { EventsExchangeService } from './services/events-exchange.service';
 
+import { FileValidator } from './directives/input-file-validate.directive';
+import { FileValueAccessorDirective } from './directives/file-value-accessor.directive';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -27,7 +30,9 @@ import { EventsExchangeService } from './services/events-exchange.service';
     AddNewCollectionComponent,
     OneCollectionComponent,
     AddNewImageComponent,
-    ModalWrapperComponent
+    ModalWrapperComponent,
+    FileValidator,
+    FileValueAccessorDirective
   ],
   imports: [
     BrowserModule,

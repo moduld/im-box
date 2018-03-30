@@ -1,7 +1,9 @@
 <app-modal-wrapper [emitter]="closeModal">
-  <form class="mod-content-body" [formGroup]="addCollectionForm" (submit)="createGroup()">
-    <h4>New collection name</h4>
+  <form class="mod-content-body" [formGroup]="addImageForm" (submit)="addImage()">
+    <h4>Add new image</h4>
     <input type="text" formControlName="title" class="field-name">
-    <button type="submit" [disabled]="addCollectionForm.invalid" class="btn btn-success">Create</button>
+    <input type="file" id="input_file_id" formControlName="image" class="hidden" requiredFile>
+    <label for="input_file_id" class="btn btn-default add-image">Add image</label>
+    <button type="submit" [disabled]="addImageForm.invalid" class="btn btn-success">Create</button>
   </form>
 </app-modal-wrapper>
