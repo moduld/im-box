@@ -2,6 +2,7 @@
   position: relative;
   display: block;
   flex: 1;
+  overflow-y: auto;
 }
 .collection {
   width: 200px;
@@ -32,17 +33,4 @@
   font-size: 18px;
   max-height: 50px;
   line-height: 25px;
-}
-.add-new {
-  position: absolute;
-  right: 50px;
-  bottom: 50px;
-  height: 50px;
-  width: 50px;
-  border-radius: 50%;
-  background-color: gray;
-    font-size: 50px;
-    color: white;
-  font-weight: bold;
-  cursor: pointer;
 }

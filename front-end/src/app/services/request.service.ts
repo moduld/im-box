@@ -45,10 +45,24 @@ export class RequestService {
     return this.httpClient.get<any>(`${this.api}/collections/${id}`, requestOptions)
   }
 
+  getCollectionImages(id: string): Observable<any> {
+    const requestOptions: {headers} = {
+      headers: new HttpHeaders({'authorization': this.localStorageService.getUser().token})
+    };
+    return this.httpClient.get<any>(`${this.api}/collections/${id}/images`, requestOptions)
+  }
+
   addImage(form: any): Observable<any> {
     const requestOptions: {headers} = {
-      headers: new HttpHeaders({'Content-Type': 'multipart/form-data', 'authorization': this.localStorageService.getUser().token})
+      headers: new HttpHeaders({'authorization': this.localStorageService.getUser().token})
     };
     return this.httpClient.post<any>(`${this.api}/images`, form, requestOptions)
+  }
+
+  getOneImage(id: string): Observable<any> {
+    const requestOptions: {headers} = {
+      headers: new HttpHeaders({'authorization': this.localStorageService.getUser().token})
+    };
+    return this.httpClient.get<any>(`${this.api}/images/${id}`, requestOptions)
   }
 }

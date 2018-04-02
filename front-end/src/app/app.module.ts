@@ -20,6 +20,7 @@ import { EventsExchangeService } from './services/events-exchange.service';
 
 import { FileValidator } from './directives/input-file-validate.directive';
 import { FileValueAccessorDirective } from './directives/file-value-accessor.directive';
+import { OneImageComponent } from './components/one-image/one-image.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { FileValueAccessorDirective } from './directives/file-value-accessor.dir
     AddNewImageComponent,
     ModalWrapperComponent,
     FileValidator,
-    FileValueAccessorDirective
+    FileValueAccessorDirective,
+    OneImageComponent
   ],
   imports: [
     BrowserModule,

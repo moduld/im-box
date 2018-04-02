@@ -12,7 +12,7 @@
 .mod-body {
   position: fixed;
   left: 50%;
-  width: 300px;
+  max-width: 100%;
   background-color: white;
   animation: modal-body-open 0.3s forwards;
 }
@@ -74,5 +74,11 @@
     transform: translate3d(-50%, 0, 0);
     opacity: 0;
     bottom: 100%;
+  }
+}
+
+@media screen and (max-width: 500px){
+  .mod-body {
+    width: calc(100% - 30px);
   }
 }

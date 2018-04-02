@@ -6,6 +6,7 @@ import { CollectionsComponent } from './components/collections/collections.compo
 import { AddNewCollectionComponent } from './components/add-new-collection/add-new-collection.component';
 import { OneCollectionComponent } from './components/one-collection/one-collection.component';
 import { AddNewImageComponent } from './components/add-new-image/add-new-image.component';
+import { OneImageComponent } from './components/one-image/one-image.component';
 
 const routes: Routes = [
   {
@@ -31,6 +32,10 @@ const routes: Routes = [
           {
             path: 'add-new',
             component: AddNewImageComponent
+          },
+          {
+            path: ':img-id',
+            component: OneImageComponent
           }
         ]
       }

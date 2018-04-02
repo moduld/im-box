@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute} from '@angular/router';
 import { RequestService } from '../../services/request.service';
+import { EventsExchangeService } from '../../services/events-exchange.service';
 
 @Component({
   selector: 'app-one-collection',
@@ -11,10 +12,12 @@ import { RequestService } from '../../services/request.service';
 export class OneCollectionComponent implements OnInit {
 
   collection: any = null;
+  images: any[] = [];
 
   constructor(private requestService: RequestService,
               private router: Router,
-              private activatedRoute: ActivatedRoute) { }
+              private activatedRoute: ActivatedRoute,
+              private eventsExchangeService: EventsExchangeService) { }
 
 
   ngOnInit() {
@@ -26,7 +29,24 @@ export class OneCollectionComponent implements OnInit {
         },
         (error: any) => {
 
+        });
+
+    this.requestService.getCollectionImages(this.activatedRoute.params['value']['id'])
+      .subscribe(
+        (images: any) => {
+          console.log(images);
+          this.images = images;
+        },
+        (error: any) => {
+
+        });
+
+    this.eventsExchangeService.imageAdded
+      .subscribe(
+        (image: any) => {
+          this.images.unshift(image)
         })
   }
+
 
 }

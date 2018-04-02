@@ -5,4 +5,5 @@ import { Subject } from "rxjs/Subject";
 export class EventsExchangeService {
 
   collectionCreated: Subject<any> = new Subject<any>();
+  imageAdded: Subject<any> = new Subject<any>();
 }

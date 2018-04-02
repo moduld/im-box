@@ -1,0 +1,9 @@
+<app-modal-wrapper [emitter]="closeModal">
+  <div class="wrapper" *ngIf="currentImageData">
+    <div [ngStyle]="{'background-image': 'url(http://localhost:8001/' + currentImageData.path + ')'}" class="image"></div>
+    <form [formGroup]="changeTitleForm" (submit)="changeTitle()">
+      <input type="text" class="img-title" formControlName="title">
+      <select name="" id=""></select>
+    </form>
+  </div>
+</app-modal-wrapper>

@@ -1,28 +1,28 @@
-const Form = require('multipart-data').Form;
+const Form = require('multiparty');
 const uuid = require('uuid/v1');
 const Config = require('../configs/config');
 
 module.exports = function (req, res, next) {
-  const form = new Form();
+  let form = new Form.Form();
 
-  function fileFilter(file) {
-    return Config.fileMimes.indexOf(file.type) !== -1
+  function fileFilter(type) {
+    return Config.fileMimes.indexOf(type) !== -1
   }
 
   form.parse(req, function (err, fields, files) {
     if (!err) {
       if (fields.collectionId && files.image) {
-        if (fileFilter(files.image)) {
-          if (files.image.size < Config.maxFileSize) {
+        if (fileFilter(files.image[0].headers['content-type'])) {
+          if (files.image[0].size < Config.maxFileSize) {
             let id = uuid();
-            let extension = files.image.type.split('/')[1];
+            let extension = files.image[0].headers['content-type'].split('/')[1];
             req.fileInfo = {
               name: `${id}.${extension}`,
               id: id,
-              title: fields.title ? fields.title : files.image.filename.substring(1, 100),
+              title: fields.title[0] ? fields.title : files.image[0].originalFilename.substring(0, 100),
               extension: extension,
-              mime: files.image.type,
-              tempPath: files.image.path
+              mime: files.image[0].headers['content-type'],
+              tempPath: files.image[0].path
             };
             req.fields = fields;
           } else {

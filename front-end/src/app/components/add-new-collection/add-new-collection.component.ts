@@ -30,7 +30,6 @@ export class AddNewCollectionComponent implements OnInit {
     this.requestService.createCollection(this.addCollectionForm.value)
     .subscribe(
       (collection: any) => {
-        console.log (collection);
         this.eventsExchangeService.collectionCreated.next(collection);
         this.closeModal.emit();
       },

@@ -2,3 +2,35 @@
   display: block;
   padding: 10px;
 }
+.image-wrapper {
+  width: 300px;
+  height: 169px;
+  background: rgba(0, 0, 0, 0.1);
+  margin: 15px auto 0;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid gray;
+  border-radius: 5px;
+}
+.image {
+  display: block;
+  height: auto;
+  width: 100%;
+  cursor: pointer;
+}
+.title-wrapp {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 10px;
+}
+.title {
+  display: block;
+  color: white;
+  overflow: hidden;
+  font-size: 18px;
+  max-height: 50px;
+  line-height: 25px;
+}

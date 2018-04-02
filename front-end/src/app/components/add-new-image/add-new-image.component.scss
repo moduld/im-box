@@ -1,16 +1,21 @@
 .mod-content-body {
   padding: 20px;
   text-align: center;
+  width: 300px;
 }
 .field-name {
   padding: 8px 10px;
   width: 100%;
-  margin-bottom: 20px;
 }
 .hidden {
   display: none;
 }
-.add-image {
+.margin {
+  margin: 15px 0;
+}
 
-
+@media screen and (max-width: 500px){
+  .mod-content-body {
+    width: 100%;
+  }
 }
