@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './routing';
@@ -17,10 +17,12 @@ import { ModalWrapperComponent } from './components/modal-wrapper/modal-wrapper.
 import { RequestService } from './services/request.service';
 import { LocalStorageService } from './services/local-storage.service';
 import { EventsExchangeService } from './services/events-exchange.service';
+import { StateKeeperService } from './services/state-keeper.service';
 
 import { FileValidator } from './directives/input-file-validate.directive';
 import { FileValueAccessorDirective } from './directives/file-value-accessor.directive';
 import { OneImageComponent } from './components/one-image/one-image.component';
+import { SortAllImagesComponent } from './components/sort-all-images/sort-all-images.component';
 
 @NgModule({
   declarations: [
@@ -34,18 +36,21 @@ import { OneImageComponent } from './components/one-image/one-image.component';
     ModalWrapperComponent,
     FileValidator,
     FileValueAccessorDirective,
-    OneImageComponent
+    OneImageComponent,
+    SortAllImagesComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    FormsModule
   ],
   providers: [
     RequestService,
     LocalStorageService,
-    EventsExchangeService
+    EventsExchangeService,
+    StateKeeperService
   ],
   bootstrap: [AppComponent]
 })

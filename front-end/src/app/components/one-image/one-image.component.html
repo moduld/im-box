@@ -1,9 +1,13 @@
 <app-modal-wrapper [emitter]="closeModal">
   <div class="wrapper" *ngIf="currentImageData">
     <div [ngStyle]="{'background-image': 'url(http://localhost:8001/' + currentImageData.path + ')'}" class="image"></div>
-    <form [formGroup]="changeTitleForm" (submit)="changeTitle()">
+    <form [formGroup]="changeTitleForm" class="form-container flex-default-wrapp" (submit)="submitForm()">
       <input type="text" class="img-title" formControlName="title">
-      <select name="" id=""></select>
+      <select class="img-select" formControlName="collection">
+        <option [value]="collection.id" *ngFor="let collection of collections">{{collection.title}}</option>
+      </select>
+      <button type="submit" class="btn btn-success" [disabled]="!titleWasChanged && !collectionWasChanged">Change</button>
+      <button type="button" class="delete-button btn btn-danger" (click)="deleteImage()">Delete</button>
     </form>
   </div>
 </app-modal-wrapper>

@@ -1,5 +1,5 @@
 .wrapper {
-
+  position: relative;
 }
 .image {
   width: 90vw;
@@ -8,4 +8,27 @@
   background: center center no-repeat;
   background-size: contain;
 }
+.form-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(255,255,255,0.6);
+  padding: 5px;
+  overflow: hidden;
+}
+.img-title,
+.img-select {
+  padding: 8px;
+  background: transparent;
+  border: 1px solid gray;
+  font-size: 14px;
+  margin-right: 15px;
+  width: 250px;
+}
+.img-select {
 
+}
+.delete-button {
+  margin-left: auto;
+}

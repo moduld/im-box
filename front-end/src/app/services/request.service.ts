@@ -65,4 +65,33 @@ export class RequestService {
     };
     return this.httpClient.get<any>(`${this.api}/images/${id}`, requestOptions)
   }
+
+  changeImageCollection(requestBody: any): Observable<any> {
+    const requestOptions: {headers} = {
+      headers: new HttpHeaders({'Content-Type': 'application/json', 'authorization': this.localStorageService.getUser().token})
+    };
+    return this.httpClient.patch<any>(`${this.api}/images`, JSON.stringify(requestBody), requestOptions)
+  }
+
+  changeImageTitle(id: string, requestBody: any): Observable<any> {
+    const requestOptions: {headers} = {
+      headers: new HttpHeaders({'Content-Type': 'application/json', 'authorization': this.localStorageService.getUser().token})
+    };
+    return this.httpClient.put<any>(`${this.api}/images/${id}`, JSON.stringify(requestBody), requestOptions)
+  }
+
+  deleteImages(requestBody: any): Observable<any> {
+    const requestOptions = {
+      headers: new HttpHeaders({'Content-Type': 'application/json', 'authorization': this.localStorageService.getUser().token}),
+      body: JSON.stringify(requestBody)
+    };
+    return this.httpClient.delete<any>(`${this.api}/images`, requestOptions)
+  }
+
+  editCollection(id: string, requestBody: any): Observable<any> {
+    const requestOptions: {headers} = {
+      headers: new HttpHeaders({'Content-Type': 'application/json', 'authorization': this.localStorageService.getUser().token})
+    };
+    return this.httpClient.put<any>(`${this.api}/collections/${id}`, JSON.stringify(requestBody), requestOptions)
+  }
 }

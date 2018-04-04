@@ -1,7 +1,16 @@
 <span class="back-to-collections" routerLink="../">Back to list</span>
-<h2 [innerHtml]="collection?.title"></h2>
-<div class="images-container flex-default-wrapp">
+<div class="title-input-wrapp glyphicon glyphicon-pencil">
+  <input [(ngModel)]="collection.title" class="input-title" (change)="changeCollectionName()">
+</div>
+<div>
+  <button type="button" class="btn btn-danger" (click)="deleteSelected()" [disabled]="!labelledToDeleteId.length">Delete selected</button>
+</div>
+<div class="images-container flex-default-wrapp" (click)="onContainerClick($event)">
   <div class="image-wrapper flex-center" *ngFor="let image of images">
+    <span class="delete-button glyphicon glyphicon-trash" [attr.data-id]="image.id" *ngIf="!image.labelledToDeleteId; else elseBlock"></span>
+    <ng-template #elseBlock>
+      <span class="delete-button glyphicon glyphicon-share-alt" [attr.data-id]="image.id"></span>
+    </ng-template>
     <img class="image" [src]="'http://localhost:8001/' + image.path" alt="{{image.title}}" routerLink="{{image.id}}">
     <div class="title-wrapp">
       <span class="title" [innerHtml]="image.title"></span>

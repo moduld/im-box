@@ -1,10 +1,13 @@
 <nav class="navbar navbar-default">
   <ul class="nav navbar-nav">
-    <li routerLink="login" routerLinkActive="active">
+    <li routerLink="login" routerLinkActive="active" *ngIf="showLogin">
       <a>Login</a>
     </li>
     <li routerLink="registration" routerLinkActive="active">
       <a>Registration</a>
+    </li>
+    <li routerLink="sort-all" routerLinkActive="active" *ngIf="!showLogin">
+      <a>Sort all images</a>
     </li>
   </ul>
 </nav>

@@ -7,6 +7,7 @@ import { AddNewCollectionComponent } from './components/add-new-collection/add-n
 import { OneCollectionComponent } from './components/one-collection/one-collection.component';
 import { AddNewImageComponent } from './components/add-new-image/add-new-image.component';
 import { OneImageComponent } from './components/one-image/one-image.component';
+import { SortAllImagesComponent } from './components/sort-all-images/sort-all-images.component';
 
 const routes: Routes = [
   {
@@ -40,6 +41,10 @@ const routes: Routes = [
         ]
       }
     ]
+  },
+  {
+    path: 'sort-all',
+    component: SortAllImagesComponent
   },
   {
     path: '',

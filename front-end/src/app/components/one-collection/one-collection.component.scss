@@ -2,6 +2,31 @@
   display: block;
   padding: 10px;
 }
+.title-input-wrapp {
+  position: relative;
+  &:before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translate3d(-50%, -50%, 0);
+    color: #00BFFF;
+    opacity: 0;
+    transition: 0.25s;
+  }
+  &:hover {
+    &:before {
+      opacity: 1;
+    }
+  }
+}
+.input-title {
+  font-size: 20px;
+  background-color: white;
+  padding: 10px;
+  border: none;
+  outline: none;
+  font-family: sans-serif;
+}
 .image-wrapper {
   width: 300px;
   height: 169px;
@@ -33,4 +58,13 @@
   font-size: 18px;
   max-height: 50px;
   line-height: 25px;
+}
+.delete-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  padding: 5px;
+  font-size: 16px;
+  background-color: rgba(255, 255, 255, 0.7);
+  border: 1px solid black;
 }

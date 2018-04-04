@@ -384,7 +384,7 @@ router.get(`${prefix}/images/:id`, (req, res) => {
 });
 
 router.delete(`${prefix}/images`, (req, res) => {
-  let imagesArray = req.body.images;
+  let imagesArray = req.body;
   Image.find({"user": req.currentUser._id.toString(), "id": {$in: imagesArray}})
     .then(foundImages => {
       let mappedArray = foundImages.map(img => {
@@ -431,7 +431,7 @@ router.get(`${prefix}/images`, (req, res) => {
 });
 
 router.patch(`${prefix}/images`, (req, res) => {
-  let imagesArray = req.body.images;
+  let imagesArray = req.body;
   let output = [];
   imagesArray.forEach((imageObject, index) => {
     if (imageObject.id && imageObject.newCollection) {
