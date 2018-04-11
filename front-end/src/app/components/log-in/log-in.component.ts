@@ -34,6 +34,7 @@ export class LogInComponent implements OnInit {
       .subscribe(
         (resp: any) => {
           resp && this.localStorageService.setUser(resp);
+          this.router.navigate(['collections']);
       },
         (error: any) => {
         console.log(error)

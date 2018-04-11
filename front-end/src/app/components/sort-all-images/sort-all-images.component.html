@@ -1,3 +1,47 @@
-<p>
-  sort-all-images works!
-</p>
+<div class=" finish-sorting-container" [ngStyle]="{'max-height': alreadySortedImages.length ? '100px' : '0'}">
+  <button class="with-margin btn btn-success" (click)="finishSorting()">Finish sorting</button>
+</div>
+
+<div (click)="handleClickEvents($event)">
+  <div class="swiper-container" appSwiper [startSlider]="startSlider">
+    <div class="swiper-wrapper">
+      <div class="swiper-slide collection flex-center"
+           *ngFor="let collection of collections; let ind = index"
+           appEndNgFor [last]="ind === collections.length - 1"
+           [startSlider]="startSlider"
+           dropDirective
+           (dropEvent)="addDropItem($event, collection)">
+        <input type="checkbox" class="toggler" [checked]="collection.showMenu">
+        <div class="added-images-container">
+          <div class="button-position" *ngIf="collection.images.length">
+            <button class="show-close-menu btn btn-default glyphicon glyphicon-list"
+                    [attr.data-button]="'showMenu'" [attr.data-index]="ind"></button>
+          </div>
+          <div class="images-scroll-container">
+            <div class="added-image flex-center" *ngFor="let image of collection.images; let imgIndex = index">
+              <span class="img-name" [innerHtml]="image.title"></span>
+              <button type="button" class="btn btn-default glyphicon glyphicon-share-alt"
+                      [attr.data-button]="'removeImage'" [attr.data-id]="image.id" [attr.data-index]="ind" [attr.data-img-index]="imgIndex"></button>
+            </div>
+          </div>
+        </div>
+        <img [src]="collection.thumbnail ? 'http://localhost:8001/' + collection.thumbnail : 'assets/images/noimage.jpg'"
+          alt="" class="collection-thumbnail">
+        <div class="title-wrapp">
+          <span class="title" [innerHtml]="collection.title"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="images-container flex-default-wrapp">
+  <div class="image-wrapper flex-center"
+       *ngFor="let image of images | imageSorting: alreadySortedImages: alreadySortedImages.length"
+       [dragDirective]='image'>
+    <img class="image" [src]="'http://localhost:8001/' + image.path" alt="{{image.title}}">
+    <div class="title-wrapp">
+      <span class="title" [innerHtml]="image.title"></span>
+    </div>
+  </div>
+</div>

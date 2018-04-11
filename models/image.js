@@ -8,5 +8,6 @@ module.exports = mongoose.model('Image', new Schema({
   user: String,
   collectionId: String,
   path: String,
-  mime: String
+  mime: String,
+  isThumbnail: Boolean
 }));

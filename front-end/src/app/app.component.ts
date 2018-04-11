@@ -23,4 +23,10 @@ export class AppComponent implements OnInit {
         this.showLogin = !this.localStorageService.getUser();
       })
   }
+
+  logOut(): void {
+    this.localStorageService.deleteUser();
+    this.router.navigate(['login']);
+    this.showLogin = !this.localStorageService.getUser();
+  }
 }

@@ -94,4 +94,18 @@ export class RequestService {
     };
     return this.httpClient.put<any>(`${this.api}/collections/${id}`, JSON.stringify(requestBody), requestOptions)
   }
+
+  deleteCollection(id: string): Observable<any> {
+    const requestOptions = {
+      headers: new HttpHeaders({'Content-Type': 'application/json', 'authorization': this.localStorageService.getUser().token}),
+    };
+    return this.httpClient.delete<any>(`${this.api}/collections/${id}`, requestOptions)
+  }
+
+  getAllImages(): Observable<any> {
+    const requestOptions: {headers} = {
+      headers: new HttpHeaders({'authorization': this.localStorageService.getUser().token})
+    };
+    return this.httpClient.get<any>(`${this.api}/images`, requestOptions)
+  }
 }

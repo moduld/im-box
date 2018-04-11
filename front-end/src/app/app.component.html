@@ -6,8 +6,14 @@
     <li routerLink="registration" routerLinkActive="active">
       <a>Registration</a>
     </li>
+    <li routerLink="collections" routerLinkActive="active" *ngIf="!showLogin">
+      <a>My collections</a>
+    </li>
     <li routerLink="sort-all" routerLinkActive="active" *ngIf="!showLogin">
       <a>Sort all images</a>
+    </li>
+    <li *ngIf="!showLogin" (click)="logOut()" class="float-right">
+      <a>Log out</a>
     </li>
   </ul>
 </nav>

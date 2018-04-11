@@ -1,0 +1,116 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.finish-sorting-container {
+  //max-height: 0;
+  transition: 0.25s;
+  overflow: hidden;
+}
+//.show-finish-sorting {
+//  max-height: 100px;
+//}
+.with-margin {
+  margin: 8px;
+}
+.collection {
+  width: 200px;
+  height: 250px;
+  position: relative;
+  border: 1px solid gray;
+  border-radius: 5px;
+  overflow: hidden;
+  cursor: pointer;
+  margin: 15px auto 0;
+}
+.collection-thumbnail {
+  height: 100%;
+  display: block;
+}
+.title-wrapp {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 10px;
+}
+.title {
+  display: block;
+  color: white;
+  overflow: hidden;
+  font-size: 18px;
+  max-height: 50px;
+  line-height: 25px;
+}
+
+.image-wrapper {
+  width: 300px;
+  height: 169px;
+  background: rgba(0, 0, 0, 0.1);
+  margin: 15px auto 0;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid gray;
+  border-radius: 5px;
+}
+.image {
+  display: block;
+  height: auto;
+  width: 100%;
+  pointer-events: none;
+}
+.images-container {
+  flex: 1;
+  overflow-y: auto;
+  margin-top: 30px;
+}
+.added-images-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1;
+  transform: translate3d(100%, 0, 0);
+  transition: 0.25s transform;
+}
+.toggler {
+  display: none;
+  &:checked + .added-images-container {
+    transform: translate3d(0, 0, 0);
+    & > .button-position > .show-close-menu {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+}
+.added-image {
+  padding: 5px;
+}
+.img-name {
+  flex: 1;
+  margin-left: 5px;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.btn-default {
+  font-size: 10px;
+}
+.button-position {
+  position: relative;
+}
+.images-scroll-container {
+  height: 100%;
+  overflow-y: auto;
+  padding-top: 30px;
+}
+.show-close-menu {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate3d(-100%, 0, 0);
+}

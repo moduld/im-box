@@ -20,10 +20,10 @@
       "prefix": "app",
       "styles": [
         "styles.css",
-        "../node_modules/bootstrap3/dist/css/bootstrap.min.css"
+        "../node_modules/bootstrap3/dist/css/bootstrap.min.css",
+        "../node_modules/swiper/dist/css/swiper.min.css"
       ],
       "scripts": [
-
       ],
       "environmentSource": "environments/environment.ts",
       "environments": {

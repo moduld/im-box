@@ -3,6 +3,8 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 
+import { DragDropDirectiveModule} from "angular4-drag-drop";
+
 import { AppRoutingModule } from './routing';
 
 import { AppComponent } from './app.component';
@@ -23,6 +25,9 @@ import { FileValidator } from './directives/input-file-validate.directive';
 import { FileValueAccessorDirective } from './directives/file-value-accessor.directive';
 import { OneImageComponent } from './components/one-image/one-image.component';
 import { SortAllImagesComponent } from './components/sort-all-images/sort-all-images.component';
+import { SwiperDirective } from './directives/swiper.directive';
+import { EndNgForDirective } from './directives/end-ng-for.directive';
+import { ImageSortingPipe } from './pipes/image-sorting.pipe';
 
 @NgModule({
   declarations: [
@@ -37,14 +42,18 @@ import { SortAllImagesComponent } from './components/sort-all-images/sort-all-im
     FileValidator,
     FileValueAccessorDirective,
     OneImageComponent,
-    SortAllImagesComponent
+    SortAllImagesComponent,
+    SwiperDirective,
+    EndNgForDirective,
+    ImageSortingPipe
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     ReactiveFormsModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    DragDropDirectiveModule
   ],
   providers: [
     RequestService,

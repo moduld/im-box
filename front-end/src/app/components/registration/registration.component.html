@@ -17,6 +17,10 @@
         <span class="input-group-addon">P</span>
         <input type="password" class="form-control" placeholder="Password" formControlName="password">
       </div>
+      <div class="form-check">
+        <input type="checkbox" class="form-check-input" id="sign_me_after_success" formControlName="signIn">
+        <label class="form-check-label" for="sign_me_after_success">Sign me in after success registration</label>
+      </div>
       <div class="btn-group" role="group">
         <button type="submit" [disabled]="registrationForm.invalid" class="btn btn-default">Registrate</button>
       </div>

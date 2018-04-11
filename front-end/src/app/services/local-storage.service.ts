@@ -12,4 +12,8 @@ export class LocalStorageService {
   getUser(): any {
     return JSON.parse(localStorage.getItem('im-box-user'));
   }
+
+  deleteUser(): any {
+    localStorage.removeItem('im-box-user');
+  }
 }

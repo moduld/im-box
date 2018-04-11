@@ -20,6 +20,7 @@ export class OneCollectionComponent implements OnInit, OnDestroy {
   deletedSubscription: any;
   labelledToDeleteId: string[] = [];
   currentCollectionId: string = '';
+  isThumbnailDelete: boolean = false;
 
   constructor(private requestService: RequestService,
               private router: Router,
@@ -42,7 +43,6 @@ export class OneCollectionComponent implements OnInit, OnDestroy {
     this.requestService.getCollectionImages(this.currentCollectionId)
       .subscribe(
         (images: any) => {
-
           this.images = images;
         },
         (error: any) => {
@@ -97,16 +97,37 @@ export class OneCollectionComponent implements OnInit, OnDestroy {
   }
 
   onContainerClick(event: any): void {
-    if (event.target.dataset.id) {
+    if (event.target.dataset.button) {
       let id: string = event.target.dataset.id;
       let foundImageIndex: number = this.findItem(id);
-      if (this.labelledToDeleteId.indexOf(id) === -1) {
-        this.labelledToDeleteId.push(id);
-        this.images[foundImageIndex]['labelledToDeleteId'] = true;
+      if (event.target.dataset.button === 'trash') {
+        if (this.labelledToDeleteId.indexOf(id) === -1) {
+          this.labelledToDeleteId.push(id);
+          this.images[foundImageIndex]['labelledToDeleteId'] = true;
+          if (this.images[foundImageIndex]['isThumbnail']) {
+            this.isThumbnailDelete = true;
+          }
+        } else {
+          this.labelledToDeleteId.splice(this.labelledToDeleteId.indexOf(id), 1);
+          this.images[foundImageIndex]['labelledToDeleteId'] = false;
+          if (this.images[foundImageIndex]['isThumbnail']) {
+            this.isThumbnailDelete = false;
+          }
+        }
       } else {
-        this.labelledToDeleteId.splice(this.labelledToDeleteId.indexOf(id), 1);
-        this.images[foundImageIndex]['labelledToDeleteId'] = false;
+        this.requestService.editCollection(this.currentCollectionId, {newThumbnail: id})
+          .subscribe(
+            (collection: any) => {
+              this.images.forEach((item: any, index: number) => {
+                item.isThumbnail = index === foundImageIndex;
+              });
+              this.eventsExchangeService.renewCollectionsList.next();
+            },
+            (error: any) => {
+
+            });
       }
+
     }
   }
 
@@ -120,6 +141,9 @@ export class OneCollectionComponent implements OnInit, OnDestroy {
               this.images.splice(foundImageIndex, 1);
             });
             this.labelledToDeleteId = [];
+            if (this.isThumbnailDelete) {
+              this.eventsExchangeService.renewCollectionsList.next();
+            }
           },
           (error: any) => {
 
@@ -132,6 +156,19 @@ export class OneCollectionComponent implements OnInit, OnDestroy {
       .subscribe(
         (collection: any) => {
           this.collection = collection;
+          this.eventsExchangeService.renewCollectionsList.next();
+        },
+        (error: any) => {
+
+        });
+  }
+
+  deleteCollection(): void {
+    this.requestService.deleteCollection(this.currentCollectionId)
+      .subscribe(
+        (collection: any) => {
+          this.eventsExchangeService.renewCollectionsList.next();
+          this.router.navigate(['collections']);
         },
         (error: any) => {
 

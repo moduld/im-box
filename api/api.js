@@ -15,7 +15,9 @@ const Image = require('../models/image');
 const validators = require('../modules/validators');
 
 const dataObjectsCreate = require('../modules/data-objects-create');
-mongoose.connect(config.database);
+mongoose.connect(config.database).catch((data) => {
+    console.log(data)
+  });
 
 const prefix = config.prefix;
 
@@ -230,20 +232,48 @@ router.put(`${prefix}/collections/:id`, (req, res) => {
         if (collection.user.toString() === req.currentUser._id.toString()) {
           let updatedData = {};
           data.title ? updatedData['title'] = data.title : '';
-          data.newThumbnail ? updatedData['thumbnail'] = data.newThumbnail : '';
-          Collection.findByIdAndUpdate(collection._id, updatedData, {new: true})
-            .then(collection => {
-              let output = {
-                id: collection.id,
-                title: collection.title,
-                thumbnail: collection.thumbnail,
-                images: collection.images
-              };
-              res.status(201).json(output);
-            })
-            .catch(() => {
-              res.status(500).json({message: 'Server error', success: false});
+          data.newThumbnail ? updatedData['thumbnailId'] = data.newThumbnail : '';
+          if (data.newThumbnail) {
+            Image.findOne({collectionId: collId, isThumbnail: true}, function (err, doc){
+              if (err) {
+                return;
+              }
+              if (doc) {
+                doc.isThumbnail = false;
+                doc.save();
+              }
             });
+            Image.findOne({id: data.newThumbnail}, function (err, doc){
+              if (err) {
+                return;
+              }
+              if (doc) {
+                doc.isThumbnail = true;
+                doc.save();
+                updatedData.thumbnail = doc.path;
+                updateCollection(updatedData);
+              }
+            });
+          }
+          if (!data.newThumbnail) {
+            updateCollection(updatedData);
+          }
+          function updateCollection(data) {
+            Collection.findByIdAndUpdate(collection._id, data, {new: true})
+              .then(collection => {
+                let output = {
+                  id: collection.id,
+                  title: collection.title,
+                  thumbnail: collection.thumbnail,
+                  images: collection.images
+                };
+                res.status(201).json(output);
+              })
+              .catch(() => {
+                res.status(500).json({message: 'Server error', success: false});
+              });
+          }
+
         } else {
           res.status(401).json({message: 'Access denied', success: false})
         }
@@ -266,6 +296,7 @@ router.delete(`${prefix}/collections/:id`, (req, res) => {
             .then(() => {
               Image.find({collectionId: collId})
                 .then(images => {
+                  console.log(images);
                   images.forEach(img => {
                     fs.unlink(img.path, err => {
                       if (err) {
@@ -306,7 +337,8 @@ router.post(`${prefix}/images`, validAndSave, (req, res) => {
               user: req.currentUser._id,
               collectionId: req.fields.collectionId,
               path: `uploads/${req.currentUser._id}/${req.fileInfo.id}.${req.fileInfo.extension}`,
-              mime: req.fileInfo.mime
+              mime: req.fileInfo.mime,
+              isThumbnail: false
             };
             Image.create(imageObject)
               .then((img) => {
@@ -347,12 +379,13 @@ router.get(`${prefix}/collections/:id/images`, (req, res) => {
   Image.find({collectionId: collId})
     .then(collection => {
 
-      let output = collection.map(coll => {
+      let output = collection.map(img => {
         return {
-          id: coll.id,
-          title: coll.title,
-          path: coll.path,
-          collectionId: coll.collectionId
+          id: img.id,
+          title: img.title,
+          path: img.path,
+          collectionId: img.collectionId,
+          isThumbnail: img.isThumbnail
         }
       });
       res.status(200).json(output)
@@ -371,7 +404,8 @@ router.get(`${prefix}/images/:id`, (req, res) => {
           id: img.id,
           title: img.title,
           path: img.path,
-          collectionId: img.collectionId
+          collectionId: img.collectionId,
+          isThumbnail: img.isThumbnail
         };
         res.status(200).json(output);
       } else {
@@ -398,6 +432,19 @@ router.delete(`${prefix}/images`, (req, res) => {
                 console.log(err)
               }
             });
+            if (img.isThumbnail) {
+              Collection.findOne({id: img.collectionId})
+                .then(collection => {
+                  if (collection) {
+                    collection.thumbnail = '';
+                    collection.thumbnailId = '';
+                    collection.save();
+                  }
+                })
+                .catch((err) => {
+                  console.log(err);
+                });
+            }
           });
           res.status(200).json({success: true});
         })
@@ -420,7 +467,8 @@ router.get(`${prefix}/images`, (req, res) => {
           id: img.id,
           title: img.title,
           path: img.path,
-          collectionId: img.collectionId
+          collectionId: img.collectionId,
+          isThumbnail: img.isThumbnail
         };
       });
       res.status(200).json(output);
@@ -438,14 +486,28 @@ router.patch(`${prefix}/images`, (req, res) => {
       Image.findOne({id: imageObject.id})
         .then(image => {
           if (image.user.toString() === req.currentUser._id.toString()) {
-            Image.findByIdAndUpdate(image._id, {collectionId: imageObject.newCollection}, {new: true})
+            Image.findByIdAndUpdate(image._id, {collectionId: imageObject.newCollection, isThumbnail: false}, {new: true})
               .then(updated => {
                 output.push({
                   id: updated.id,
                   title: updated.title,
                   path: updated.path,
-                  collectionId: updated.collectionId
+                  collectionId: updated.collectionId,
+                  isThumbnail: updated.isThumbnail
                 });
+                if (image.isThumbnail) {
+                  Collection.findOne({id: image.collectionId})
+                    .then(collection => {
+                      if (collection) {
+                        collection.thumbnail = '';
+                        collection.thumbnailId = '';
+                        collection.save();
+                      }
+                    })
+                    .catch((err) => {
+                      console.log(err);
+                    });
+                }
                 if (index === imagesArray.length - 1) {
                   res.status(200).json(output);
                 }
@@ -480,7 +542,8 @@ router.put(`${prefix}/images/:id`, (req, res) => {
             id: doc.id,
             title: doc.title,
             path: doc.path,
-            collectionId: doc.collectionId
+            collectionId: doc.collectionId,
+            isThumbnail: doc.isThumbnail
           };
           res.status(200).json(output);
         } else {

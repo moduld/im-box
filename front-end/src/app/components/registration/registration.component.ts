@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { RequestService } from '../../services/request.service';
 import { LocalStorageService } from '../../services/local-storage.service';
 
@@ -13,6 +14,7 @@ export class RegistrationComponent implements OnInit {
   registrationForm: FormGroup;
 
   constructor(private formBuilder: FormBuilder,
+              private router: Router,
               private requestService: RequestService,
               private localStorageService: LocalStorageService) { }
 
@@ -21,7 +23,8 @@ export class RegistrationComponent implements OnInit {
       firstName: ['', Validators.required ],
       lastName: ['', Validators.required ],
       email: ['', Validators.required ],
-      password: ['', Validators.required ]
+      password: ['', Validators.required ],
+      signIn: [true, Validators.required]
     });
   }
 
@@ -29,7 +32,11 @@ export class RegistrationComponent implements OnInit {
     this.requestService.registration(this.registrationForm.value)
       .subscribe(
         (resp: any) => {
-          resp && this.localStorageService.setUser(resp);
+          if (this.registrationForm.value.signIn) {
+            resp && this.localStorageService.setUser(resp);
+            this.router.navigate(['collections']);
+          }
+          this.registrationForm.reset();
         },
         (error: any) => {
           console.log(error)

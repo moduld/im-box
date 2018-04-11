@@ -29,8 +29,8 @@ export class AddNewCollectionComponent implements OnInit {
   createGroup(): void {
     this.requestService.createCollection(this.addCollectionForm.value)
     .subscribe(
-      (collection: any) => {
-        this.eventsExchangeService.collectionCreated.next(collection);
+      () => {
+        this.eventsExchangeService.renewCollectionsList.next();
         this.closeModal.emit();
       },
       (error: any) => {
