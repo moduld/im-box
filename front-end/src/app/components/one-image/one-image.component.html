@@ -1,5 +1,6 @@
 <app-modal-wrapper [emitter]="closeModal">
   <div class="wrapper" *ngIf="currentImageData">
+    <a [href]="'http://localhost:8001/' + currentImageData.path" class="download-link glyphicon glyphicon-download-alt" target="_blank"></a>
     <div [ngStyle]="{'background-image': 'url(http://localhost:8001/' + currentImageData.path + ')'}" class="image"></div>
     <form [formGroup]="changeTitleForm" class="form-container flex-default-wrapp" (submit)="submitForm()">
       <input type="text" class="img-title" formControlName="title">

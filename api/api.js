@@ -6,6 +6,7 @@ const crypto = require('../modules/crypto');
 const fs = require('fs');
 const mv = require('mv');
 const path = require('path');
+const archiver = require('archiver');
 
 const validAndSave = require('../modules/files-validation');
 const config = require('../configs/config');
@@ -389,6 +390,35 @@ router.get(`${prefix}/collections/:id/images`, (req, res) => {
         }
       });
       res.status(200).json(output)
+    })
+    .catch(() => {
+      res.status(500).json({message: 'Server error', success: false});
+    });
+});
+
+router.get(`${prefix}/collections/:id/archived`, (req, res) => {
+  let collId = req.params.id;
+  res.header("Content-Type", "application/zip");
+  Image.find({collectionId: collId})
+    .then(collection => {
+      let archive = archiver('zip', {
+        zlib: { level: 9 }
+      });
+      archive.on('error', function(error) {
+        console.log('Unable to archive ' + error);
+      });
+      archive.on('finish', function() {
+        console.log('jhvujy');
+        res.end()
+      });
+
+      archive.pipe(res);
+
+      collection.forEach(img => {
+        archive.append(fs.createReadStream(img.path), { name: img.title });
+      });
+      archive.finalize();
+
     })
     .catch(() => {
       res.status(500).json({message: 'Server error', success: false});

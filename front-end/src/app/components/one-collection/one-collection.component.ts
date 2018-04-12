@@ -174,4 +174,19 @@ export class OneCollectionComponent implements OnInit, OnDestroy {
 
         });
   }
+
+  downloadArchive(): void {
+    this.requestService.downloadFile(this.currentCollectionId)
+      .subscribe(
+        (file: any) => {
+          console.log(file)
+          var blob = new Blob([file], { type: 'application/zip' });
+          var url = window.URL.createObjectURL(blob);
+          window.open(url);
+        },
+        (error: any) => {
+          console.log(error)
+        }
+      )
+  }
 }

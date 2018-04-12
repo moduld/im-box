@@ -108,4 +108,11 @@ export class RequestService {
     };
     return this.httpClient.get<any>(`${this.api}/images`, requestOptions)
   }
+
+  downloadFile(id: string): Observable<any> {
+    const requestOptions: {headers} = {
+      headers: new HttpHeaders({'authorization': this.localStorageService.getUser().token})
+    };
+    return this.httpClient.get<any>(`${this.api}/collections/${id}/archived`, requestOptions)
+  }
 }

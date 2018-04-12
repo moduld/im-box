@@ -6,6 +6,9 @@
 <div>
   <button type="button" class="btn btn-danger" (click)="deleteCollection()">Delete collection</button>
 </div>
+<div>
+  <button type="button" class="btn btn-success" (click)="downloadArchive()">Download</button>
+</div>
 
 <div>
   <button type="button" class="btn btn-danger" (click)="deleteSelected()" [disabled]="!labelledToDeleteId.length">Delete selected</button>
