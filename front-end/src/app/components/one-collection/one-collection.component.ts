@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute} from '@angular/router';
+import * as FileSaver from "file-saver";
 import { RequestService } from '../../services/request.service';
 import { EventsExchangeService } from '../../services/events-exchange.service';
 
@@ -179,10 +180,8 @@ export class OneCollectionComponent implements OnInit, OnDestroy {
     this.requestService.downloadFile(this.currentCollectionId)
       .subscribe(
         (file: any) => {
-          console.log(file)
-          var blob = new Blob([file], { type: 'application/zip' });
-          var url = window.URL.createObjectURL(blob);
-          window.open(url);
+          let blob = new Blob([file], { type: 'application/zip' });
+          FileSaver['saveAs'](blob, `${this.collection.title}.zip`);
         },
         (error: any) => {
           console.log(error)

@@ -408,8 +408,7 @@ router.get(`${prefix}/collections/:id/archived`, (req, res) => {
         console.log('Unable to archive ' + error);
       });
       archive.on('finish', function() {
-        console.log('jhvujy');
-        res.end()
+        res.end();
       });
 
       archive.pipe(res);
@@ -418,7 +417,6 @@ router.get(`${prefix}/collections/:id/archived`, (req, res) => {
         archive.append(fs.createReadStream(img.path), { name: img.title });
       });
       archive.finalize();
-
     })
     .catch(() => {
       res.status(500).json({message: 'Server error', success: false});

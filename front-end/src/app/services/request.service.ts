@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {Observable} from "rxjs/Observable";
 import { LocalStorageService } from "./local-storage.service";
+import 'rxjs/add/operator/map';
 
 @Injectable()
 export class RequestService {
@@ -110,8 +111,9 @@ export class RequestService {
   }
 
   downloadFile(id: string): Observable<any> {
-    const requestOptions: {headers} = {
-      headers: new HttpHeaders({'authorization': this.localStorageService.getUser().token})
+    const requestOptions: {headers, responseType} = {
+      headers: new HttpHeaders({'authorization': this.localStorageService.getUser().token}),
+      responseType: 'arraybuffer'
     };
     return this.httpClient.get<any>(`${this.api}/collections/${id}/archived`, requestOptions)
   }
