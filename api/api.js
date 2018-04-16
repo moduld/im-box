@@ -17,8 +17,8 @@ const validators = require('../modules/validators');
 
 const dataObjectsCreate = require('../modules/data-objects-create');
 mongoose.connect(config.database).catch((data) => {
-    console.log(data)
-  });
+  console.log(data)
+});
 
 const prefix = config.prefix;
 
@@ -235,7 +235,7 @@ router.put(`${prefix}/collections/:id`, (req, res) => {
           data.title ? updatedData['title'] = data.title : '';
           data.newThumbnail ? updatedData['thumbnailId'] = data.newThumbnail : '';
           if (data.newThumbnail) {
-            Image.findOne({collectionId: collId, isThumbnail: true}, function (err, doc){
+            Image.findOne({collectionId: collId, isThumbnail: true}, function (err, doc) {
               if (err) {
                 return;
               }
@@ -244,7 +244,7 @@ router.put(`${prefix}/collections/:id`, (req, res) => {
                 doc.save();
               }
             });
-            Image.findOne({id: data.newThumbnail}, function (err, doc){
+            Image.findOne({id: data.newThumbnail}, function (err, doc) {
               if (err) {
                 return;
               }
@@ -259,6 +259,7 @@ router.put(`${prefix}/collections/:id`, (req, res) => {
           if (!data.newThumbnail) {
             updateCollection(updatedData);
           }
+
           function updateCollection(data) {
             Collection.findByIdAndUpdate(collection._id, data, {new: true})
               .then(collection => {
@@ -297,7 +298,6 @@ router.delete(`${prefix}/collections/:id`, (req, res) => {
             .then(() => {
               Image.find({collectionId: collId})
                 .then(images => {
-                  console.log(images);
                   images.forEach(img => {
                     fs.unlink(img.path, err => {
                       if (err) {
@@ -327,39 +327,55 @@ router.delete(`${prefix}/collections/:id`, (req, res) => {
 
 router.post(`${prefix}/images`, validAndSave, (req, res) => {
   if (!req.fileValidationError) {
-    Collection.findOne({id: req.fields.collectionId})
+    Collection.findOne({id: req.collectionId})
       .then(collection => {
         if (collection) {
           if (collection.user.toString() === req.currentUser._id.toString()) {
-            let imageObject = {
-              name: req.fileInfo.name,
-              id: req.fileInfo.id,
-              title: req.fileInfo.title,
-              user: req.currentUser._id,
-              collectionId: req.fields.collectionId,
-              path: `uploads/${req.currentUser._id}/${req.fileInfo.id}.${req.fileInfo.extension}`,
-              mime: req.fileInfo.mime,
-              isThumbnail: false
-            };
-            Image.create(imageObject)
-              .then((img) => {
-                mv(req.fileInfo.tempPath, imageObject.path, {mkdirp: true}, function (err) {
-                  if (err) {
-                    res.status(500).json({message: 'Server error', success: false});
-                  } else {
-                    let resp = {
-                      path: img.path,
-                      id: img.id,
-                      collectionId: img.collectionId,
-                      title: img.title
-                    };
-                    res.status(201).json(resp);
-                  }
-                });
-              })
-              .catch((err) => {
-                res.status(500).json({message: 'Server error', success: false});
+            let newImagesArray = [];
+            let isLoopFSBreak = false;
+            for (let i = 0; i < req.fileInfo.length; i++) {
+              mv(req.fileInfo[i].tempPath, `uploads/${req.currentUser._id}/${req.fileInfo[i].id}.${req.fileInfo[i].extension}`, {mkdirp: true}, function (err) {
+                if (err) {
+                  res.status(500).json({message: 'Server error', success: false});
+                  isLoopFSBreak = true;
+                  return;
+                } else {
+                  newImagesArray.push({
+                    name: req.fileInfo[i].name,
+                    id: req.fileInfo[i].id,
+                    title: req.fileInfo[i].title,
+                    user: req.currentUser._id,
+                    collectionId: req.collectionId,
+                    path: `uploads/${req.currentUser._id}/${req.fileInfo[i].id}.${req.fileInfo[i].extension}`,
+                    mime: req.fileInfo[i].mime,
+                    isThumbnail: false
+                  });
+                }
+                if (i === req.fileInfo.length - 1) {
+                  addToDataBase();
+                }
               });
+            }
+
+            function addToDataBase() {
+              let returnedImagesArray = [];
+              Image.create(newImagesArray, function (err, ...args) {
+                if (err) {
+                  res.status(500).json({message: 'Server error', success: false});
+                  return;
+                }
+                  let images = args[0];
+                  for (let j = 0; j < images.length; j++) {
+                    returnedImagesArray.push({
+                      path: images[j].path,
+                      id: images[j].id,
+                      collectionId: images[j].collectionId,
+                      title: images[j].title
+                    });
+                  }
+                res.status(201).json(returnedImagesArray);
+              })
+            }
           } else {
             res.status(401).json({message: 'Access denied', success: false})
           }
@@ -402,19 +418,19 @@ router.get(`${prefix}/collections/:id/archived`, (req, res) => {
   Image.find({collectionId: collId})
     .then(collection => {
       let archive = archiver('zip', {
-        zlib: { level: 9 }
+        zlib: {level: 9}
       });
-      archive.on('error', function(error) {
+      archive.on('error', function (error) {
         console.log('Unable to archive ' + error);
       });
-      archive.on('finish', function() {
+      archive.on('finish', function () {
         res.end();
       });
 
       archive.pipe(res);
 
       collection.forEach(img => {
-        archive.append(fs.createReadStream(img.path), { name: img.title });
+        archive.append(fs.createReadStream(img.path), {name: img.title});
       });
       archive.finalize();
     })
@@ -514,7 +530,10 @@ router.patch(`${prefix}/images`, (req, res) => {
       Image.findOne({id: imageObject.id})
         .then(image => {
           if (image.user.toString() === req.currentUser._id.toString()) {
-            Image.findByIdAndUpdate(image._id, {collectionId: imageObject.newCollection, isThumbnail: false}, {new: true})
+            Image.findByIdAndUpdate(image._id, {
+              collectionId: imageObject.newCollection,
+              isThumbnail: false
+            }, {new: true})
               .then(updated => {
                 output.push({
                   id: updated.id,
@@ -557,7 +576,7 @@ router.put(`${prefix}/images/:id`, (req, res) => {
   let imgId = req.params.id;
   let title = req.body.title;
   if (title) {
-    Image.findOne({id: imgId}, function (err, doc){
+    Image.findOne({id: imgId}, function (err, doc) {
       if (err) {
         res.status(500).json({message: 'Server error', success: false});
         return;

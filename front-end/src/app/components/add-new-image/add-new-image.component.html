@@ -1,11 +1,19 @@
 <app-modal-wrapper [emitter]="closeModal">
-  <form class="mod-content-body" [formGroup]="addImageForm" (submit)="addImage()">
-    <h4>Add new image</h4>
-    <input type="text" formControlName="title" class="field-name">
-    <input type="file" id="input_file_id" formControlName="image" class="hidden" requiredFile>
+  <input type="file" id="input_file_id" [(ngModel)]="inputFileModel" class="hidden" (change)="imagesAdded($event)" multiple accept="image/x-png,image/gif,image/jpeg">
+  <form class="mod-content-body" [formGroup]="addImageForm" (submit)="submitForm()">
+    <h4>Add new images</h4>
     <div class="margin">
-      <label for="input_file_id" class="btn btn-default add-image">Add image</label>
+      <label for="input_file_id" class="btn btn-default add-image">Add images</label>
     </div>
-    <button type="submit" [disabled]="addImageForm.invalid" class="btn btn-success">Create</button>
+    <div class="images-list-wrapper" formArrayName="imagesArray" (click)="removeImage($event)">
+      <div class="image-item-wrapp" *ngFor="let image of addImageForm.controls['imagesArray'].controls; let ind = index" formGroupName="{{ind}}">
+        <input type="text" formControlName="title" class="field-name">
+        <input type="file" formControlName="file"  class="hidden">
+        <button type="button" class="btn btn-danger" [attr.data-index]="ind">Remove</button>
+      </div>
+    </div>
+    <div class="margin">
+      <button type="submit" *ngIf="addImageForm.value.imagesArray.length && addImageForm.valid" class="btn btn-success">Send</button>
+    </div>
   </form>
 </app-modal-wrapper>

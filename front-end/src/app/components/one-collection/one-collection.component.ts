@@ -52,8 +52,8 @@ export class OneCollectionComponent implements OnInit, OnDestroy {
 
     this.addedSubscription = this.eventsExchangeService.imageAdded
       .subscribe(
-        (image: any) => {
-          this.images.unshift(image)
+        (images: any) => {
+          this.images = images.concat(this.images);
         });
 
     this.changedSubscription = this.eventsExchangeService.imageDataChanged
